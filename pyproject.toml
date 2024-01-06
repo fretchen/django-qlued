@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "django-qlued"
+version = "0.1.0"
+description = ""
+authors = ["fretchen <fred.jendrzejewski@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{include = "django_qlued", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django-ninja = "^1.1.0"
+sqooler = {git = "https://github.com/Alqor-UG/sqooler.git", rev = "v0.3.0"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
