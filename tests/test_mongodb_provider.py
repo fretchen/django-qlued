@@ -12,8 +12,8 @@ from django.test import TestCase
 from sqooler.storage_providers import MongodbProviderExtended as MongodbProvider
 from sqooler.schemes import MongodbLoginInformation
 
-from ..storage_providers import get_short_backend_name
-from ..models import StorageProviderDb
+from django_qlued.storage_providers import get_short_backend_name
+from django_qlued.models import StorageProviderDb
 
 User = get_user_model()
 

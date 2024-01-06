@@ -1,6 +1,6 @@
 [
 {
-  "model": "backends.backend",
+  "model": "qlued.backend",
   "pk": 2,
   "fields": {
     "name": "fermions",
@@ -120,7 +120,7 @@
   }
 },
 {
-  "model": "backends.backend",
+  "model": "qlued.backend",
   "pk": 3,
   "fields": {
     "name": "singlequdit",
@@ -221,7 +221,7 @@
   }
 },
 {
-  "model": "backends.backend",
+  "model": "qlued.backend",
   "pk": 4,
   "fields": {
     "name": "multiqudit",

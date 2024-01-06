@@ -13,12 +13,12 @@ from django.test import TestCase
 from sqooler.storage_providers import LocalProviderExtended as LocalProvider
 from sqooler.schemes import LocalLoginInformation, BackendConfigSchemaIn
 
-from ..storage_providers import (
+from django_qlued.storage_providers import (
     get_short_backend_name,
     get_storage_provider_from_entry,
 )
 
-from ..models import StorageProviderDb
+from django_qlued.models import StorageProviderDb
 
 User = get_user_model()
 

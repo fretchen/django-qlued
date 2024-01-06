@@ -8,12 +8,6 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 
 
-class User(AbstractUser):
-    """
-    The class that will contain all the fancy features of a user.
-    """
-
-
 class Token(models.Model):
     """
     The backend class for the tokens that allow access to the different backends etc.
