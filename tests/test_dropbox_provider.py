@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 from sqooler.storage_providers import DropboxProviderExtended as DropboxProvider
 from sqooler.schemes import DropboxLoginInformation
 
-from django_qlued.models import StorageProviderDb
+from qlued.models import StorageProviderDb
 
 User = get_user_model()
 

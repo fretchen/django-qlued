@@ -16,8 +16,8 @@ from django.contrib.auth import get_user_model
 
 from sqooler.storage_providers import MongodbProviderExtended as MongodbProvider
 from sqooler.schemes import MongodbLoginInformation
-from django_qlued.models import Token, StorageProviderDb
-from django_qlued.storage_providers import get_storage_provider_from_entry
+from qlued.models import Token, StorageProviderDb
+from qlued.storage_providers import get_storage_provider_from_entry
 
 User = get_user_model()
 
@@ -26,8 +26,6 @@ class BackendConfigTest(TestCase):
     """
     The class that contains all the tests for this backends app.
     """
-
-    fixtures = ["backend.json"]
 
     def setUp(self):
         self.username = config("USERNAME_TEST")
@@ -144,8 +142,6 @@ class JobSubmissionTest(TestCase):
     """
     The class that contains all the tests for this backends app.
     """
-
-    fixtures = ["backend.json"]
 
     def setUp(self):
         # create a user

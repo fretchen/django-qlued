@@ -5,7 +5,7 @@ description = ""
 authors = ["fretchen <fred.jendrzejewski@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-packages = [{include = "django_qlued", from = "src"}]
+packages = [{include = "qlued", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"

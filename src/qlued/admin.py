@@ -3,10 +3,7 @@ Module that defines some basic properties of the app.
 """
 
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import Backend, StorageProviderDb
+from .models import StorageProviderDb
 
 # Register your models here.
-
-admin.site.register(Backend)
 admin.site.register(StorageProviderDb)

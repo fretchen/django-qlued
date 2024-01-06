@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "fake-key"
 
-ROOT_URLCONF = "django_qlued.urls"
+ROOT_URLCONF = "qlued.urls"
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -20,7 +20,7 @@ INSTALLED_APPS = [
     "csp",
     "ninja",
     "tests",
-    "django_qlued",
+    "qlued",
 ]
 
 MIDDLEWARE = [
