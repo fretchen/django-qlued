@@ -74,6 +74,7 @@ jobs:
           poetry install
       - name: Run pylint
         run: |
+          export PYTHONPATH=$PYTHONPATH:$PWD
           poetry run pylint --load-plugins pylint_django --django-settings-module=tests.test_settings src
           poetry run pylint --load-plugins pylint_django --django-settings-module=tests.test_settings tests
       - name: Run black
