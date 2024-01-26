@@ -1,3 +1,5 @@
+[![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/pylint-dev/pylint)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 # django-qlued
 
 A django package the couples together quantum hardware and endusers. It allows cold atom hardware and simulators to be accessed through the `qiskit-cold-atom` and the `sqooler` SDK:
@@ -20,20 +22,19 @@ We provide a template for a simple startup:
 - The fully deployable example is accessible via [qlued](https://github.com/Alqor-UG/qlued).
 - Examples for configurations can be found in the `tests` folder.
 
-
 ## Contributing
 
 See [the contributing guide](docs/contributing.md) for detailed instructions on how to get started with a contribution to our project. We accept different **types of contributions**, most of them don't require you to write a single line of code.
 
-On the [qlued](https://alqor-ug.github.io/qlued/) site, you can click the make a contribution button at the top of the page to open a pull request for quick fixes like typos, updates, or link fixes.
+On the [qlued](https://alqor-ug.github.io/django-qlued/) site, you can click the make a contribution button at the top of the page to open a pull request for quick fixes like typos, updates, or link fixes.
 
-For more complex contributions, you can [open an issue](https://github.com/alqor-ug/qlued/issues) to describe the changes you'd like to see.
+For more complex contributions, you can [open an issue](https://github.com/alqor-ug/django-qlued/issues) to describe the changes you'd like to see.
 
-If you're looking for a way to contribute, you can scan through our [existing issues](https://github.com/alqor-ug/qlued/issues) for something to work on. 
+If you're looking for a way to contribute, you can scan through our [existing issues](https://github.com/alqor-ug/django-qlued/issues) for something to work on. 
 
 ### Join us in discussions
 
-We use GitHub Discussions to talk about all sorts of topics related to documentation and this site. For example: if you'd like help troubleshooting a PR, have a great new idea, or want to share something amazing you've learned in our docs, join us in the [discussions](https://github.com/alqor-ug/qlued/discussions).
+We use GitHub Discussions to talk about all sorts of topics related to documentation and this site. For example: if you'd like help troubleshooting a PR, have a great new idea, or want to share something amazing you've learned in our docs, join us in the [discussions](https://github.com/alqor-ug/django-qlued/discussions).
 
 ## License
 
