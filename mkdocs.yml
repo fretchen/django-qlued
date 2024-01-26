@@ -1,0 +1,34 @@
+site_name: qlued-django
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.footer
+    - toc.follow
+
+  custom_dir: docs/overrides
+
+nav:
+  - Home: index.md
+  - Contributing: contributing.md
+  - API: api.md
+
+repo_url: https://github.com/alqor-ug/qlued-django
+edit_uri: edit/main/docs/
+
+extra:
+  version:
+    provider: mike
+    
+plugins:
+- search
+- mkdocstrings
+
+markdown_extensions:
+  - toc
+  - attr_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
