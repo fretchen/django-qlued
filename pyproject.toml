@@ -24,6 +24,15 @@ mypy = "^1.7.0"
 pylint-django = "^2.5.5"
 django-stubs = {extras = ["compatible-mypy"], version = "^4.2.7"}
 
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mike = "^2.0.0"
+mkdocs-material = "^9.5.5"
+mkdocs = "^1.5.3"
+mkdocstrings-python = "^1.8.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

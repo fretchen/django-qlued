@@ -1,0 +1,30 @@
+name: documentation
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    env:
+      CURRENT_VERSION: ${{ vars.CURRENT_VERSION }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # fetch all commits/branches
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - name: Install Dependencies
+        run: |
+          pipx install poetry
+          poetry install --only docs
+      - name: Configure Git user
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+      - name: Deploy with mike now 🚀
+        run: |
+          poetry run mike deploy $CURRENT_VERSION
+          poetry run mike set-default $CURRENT_VERSION
+          git push origin gh-pages
