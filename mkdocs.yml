@@ -1,4 +1,4 @@
-site_name: qlued-django
+site_name: django-qlued
 theme:
   name: material
   features:
