@@ -8,7 +8,7 @@ from ninja import NinjaAPI
 from ninja.responses import codes_4xx
 
 from decouple import config
-
+from icecream import ic
 from dropbox.exceptions import ApiError, AuthError
 
 from sqooler.schemes import (
@@ -61,12 +61,22 @@ def get_config(request, backend_name: str):
         job_response_dict = {
             "job_id": "None",
             "status": "ERROR",
-            "detail": "Unknown back-end! The string should have 1 or three parts separated by `_`!",
+            "detail": f"Unknown back-end {backend_name}! The string should have 1 or three parts separated by `_`!",
             "error_message": "Unknown back-end!",
         }
         return 404, job_response_dict
 
-    storage_provider = get_storage_provider(backend_name)
+    try:
+        storage_provider = get_storage_provider(backend_name)
+    except StorageProviderDb.DoesNotExist:
+        job_response_dict = {
+            "job_id": "None",
+            "status": "ERROR",
+            "detail": f"Unknown back-end {backend_name}! The string should have 1 or three parts separated by `_`!",
+            "error_message": "Unknown back-end!",
+        }
+        return 404, job_response_dict
+
     config_info = storage_provider.get_backend_dict(short_backend)
     # we have to add the URL to the backend configuration
     base_url = config("BASE_URL")
@@ -240,26 +250,15 @@ def get_job_status(request, backend_name: str, job_id: str, token: str):
         job_response_dict["error_message"] = "Unknown back-end!"
         return 404, job_response_dict
 
-    # complicated right now
-    # pylint: disable=W0702
-    try:
-        job_response_dict["job_id"] = job_id
-    except:
-        job_response_dict["status"] = "ERROR"
-        job_response_dict["detail"] = "Error loading json data from input request!"
-        job_response_dict[
-            "error_message"
-        ] = "Error loading json data from input request!"
-        return 406, job_response_dict
-    try:
-        # now we download the status json from the backend
-        # this is currently very much backend specific
-        storage_provider = get_storage_provider(backend_name)
+    job_response_dict["job_id"] = job_id
 
+    storage_provider = get_storage_provider(backend_name)
+    # we might be able to get rid of this with the
+    # next version of `sqooler`
+    try:
         job_response_dict = storage_provider.get_status(
             display_name=short_backend, username=username, job_id=job_id
         )
-
         return 200, job_response_dict
     except:
         job_response_dict["status"] = "ERROR"
@@ -327,6 +326,7 @@ def get_job_result(request, backend_name: str, job_id: str, token: str):
         ] = "Error getting status from database. Maybe invalid JOB ID!"
         return 406, status_msg_draft
     # and if the status is switched to done, we can also obtain the result
+    # this can be done in the same way as the status once we have sqooler 0.5.0
     try:
         result_dict = storage_provider.get_result(
             display_name=short_backend, username=username, job_id=job_id
