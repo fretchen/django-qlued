@@ -187,9 +187,9 @@ def post_job(request, data: JobSchemaWithTokenIn, backend_name: str):
     except json.decoder.JSONDecodeError:
         job_response_dict["status"] = "ERROR"
         job_response_dict["detail"] = "The encoding of your json seems not work out!"
-        job_response_dict[
-            "error_message"
-        ] = "The encoding of your json seems not work out!"
+        job_response_dict["error_message"] = (
+            "The encoding of your json seems not work out!"
+        )
         return 406, job_response_dict
     try:
         storage_provider = get_storage_provider(backend_name)
@@ -262,12 +262,12 @@ def get_job_status(request, backend_name: str, job_id: str, token: str):
         return 200, job_response_dict
     except:
         job_response_dict["status"] = "ERROR"
-        job_response_dict[
-            "detail"
-        ] = "Error getting status from database. Maybe invalid JOB ID!"
-        job_response_dict[
-            "error_message"
-        ] = "Error getting status from database. Maybe invalid JOB ID!"
+        job_response_dict["detail"] = (
+            "Error getting status from database. Maybe invalid JOB ID!"
+        )
+        job_response_dict["error_message"] = (
+            "Error getting status from database. Maybe invalid JOB ID!"
+        )
         return 406, job_response_dict
 
 
@@ -318,12 +318,12 @@ def get_job_result(request, backend_name: str, job_id: str, token: str):
         if status_msg_draft["status"] != "DONE":
             return 200, status_msg_draft
     except:
-        status_msg_draft[
-            "detail"
-        ] = "Error getting status from database. Maybe invalid JOB ID!"
-        status_msg_draft[
-            "error_message"
-        ] = "Error getting status from database. Maybe invalid JOB ID!"
+        status_msg_draft["detail"] = (
+            "Error getting status from database. Maybe invalid JOB ID!"
+        )
+        status_msg_draft["error_message"] = (
+            "Error getting status from database. Maybe invalid JOB ID!"
+        )
         return 406, status_msg_draft
     # and if the status is switched to done, we can also obtain the result
     # this can be done in the same way as the status once we have sqooler 0.5.0
