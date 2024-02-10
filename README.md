@@ -14,7 +14,7 @@ A django package the couples together quantum hardware and endusers. It allows c
 You can currently install the package via pip through:
 
 ```
-pip install git+https://github.com/Alqor-UG/django-qlued.git
+pip install django-qlued
 ```
 
 We provide a template for a simple startup:
