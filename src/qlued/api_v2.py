@@ -15,6 +15,7 @@ from sqooler.schemes import (
     BackendStatusSchemaOut,
     StatusMsgDict,
     ResultDict,
+    get_init_status,
 )
 
 from .schemas import (
@@ -231,19 +232,16 @@ def get_job_status(request, backend_name: str, job_id: str, token: str):
     A view to check the job status that was previously submitted to the backend.
     """
     # pylint: disable=W0613
-    job_response_dict = {
-        "job_id": "None",
-        "status": "None",
-        "detail": "None",
-        "error_message": "None",
-    }
+    get_init_status
+    job_response_dict = get_init_status()
+
     # first we need to validate the token and make sure that the user is allowed to look for the job
     try:
         token_object = Token.objects.get(key=token)
     except Token.DoesNotExist:
-        job_response_dict["status"] = "ERROR"
-        job_response_dict["error_message"] = "Invalid credentials!"
-        job_response_dict["detail"] = "Invalid credentials!"
+        job_response_dict.status = "ERROR"
+        job_response_dict.error_message = "Invalid credentials!"
+        job_response_dict.detail = "Invalid credentials!"
         return 401, job_response_dict
 
     username = token_object.user.username
@@ -251,12 +249,12 @@ def get_job_status(request, backend_name: str, job_id: str, token: str):
     backend_names = storage_provider.get_backends()
     short_backend = get_short_backend_name(backend_name)
     if short_backend not in backend_names:
-        job_response_dict["status"] = "ERROR"
-        job_response_dict["detail"] = "Unknown back-end!"
-        job_response_dict["error_message"] = "Unknown back-end!"
+        job_response_dict.status = "ERROR"
+        job_response_dict.detail = "Unknown back-end!"
+        job_response_dict.error_message = "Unknown back-end!"
         return 404, job_response_dict
 
-    job_response_dict["job_id"] = job_id
+    job_response_dict.job_id = job_id
 
     storage_provider = get_storage_provider(backend_name)
 
