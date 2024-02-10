@@ -3,12 +3,10 @@ The module that contains all the necessary logic for communication with the exte
 storage for the jobs.
 """
 
-from sqooler.storage_providers import (
-    StorageProvider,
-    MongodbProviderExtended,
-    DropboxProviderExtended,
-    LocalProviderExtended,
-)
+from sqooler.storage_providers.base import StorageProvider
+from sqooler.storage_providers.mongodb import MongodbProviderExtended
+from sqooler.storage_providers.dropbox import DropboxProviderExtended
+from sqooler.storage_providers.local import LocalProviderExtended
 
 from sqooler.schemes import (
     MongodbLoginInformation,

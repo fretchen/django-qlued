@@ -9,7 +9,7 @@ from decouple import config
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
-from sqooler.storage_providers import DropboxProviderExtended as DropboxProvider
+from sqooler.storage_providers.dropbox import DropboxProviderExtended as DropboxProvider
 from sqooler.schemes import DropboxLoginInformation
 
 from qlued.models import StorageProviderDb

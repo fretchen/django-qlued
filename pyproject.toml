@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-qlued"
-version = "0.1.0"
+version = "0.1.1a0"
 description = "Django packages that enables validated cloud access to quantum hardware."
 authors = ["fretchen <fred.jendrzejewski@gmail.com>"]
 license = "Apache-2.0"
@@ -17,23 +17,23 @@ django-ninja = "^1.1.0"
 python-decouple = "^3.8"
 pytz = "^2023.3.post1"
 whitenoise = "^6.6.0"
-sqooler = "^0.4.0"
+sqooler = "^0.5.0"
 
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.0.3"
-black = "^23.12.1"
 mypy = "^1.7.0"
 pylint-django = "^2.5.5"
 django-stubs = {extras = ["compatible-mypy"], version = "^4.2.7"}
 django-csp = "^3.7"
+black = "^24.1.1"
 
 [tool.poetry.group.docs]
 optional = true
 
 [tool.poetry.group.docs.dependencies]
 mike = "^2.0.0"
-mkdocs-material = "^9.5.5"
+mkdocs-material = "^9.5.7"
 mkdocs = "^1.5.3"
 mkdocstrings-python = "^1.8.0"
 
