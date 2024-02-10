@@ -3,6 +3,7 @@ This module contains the **test** settings for the django-qlued project. So they
 to be used only in the test environment. They are not meant to be used in production. We will 
 always attempt to make them as minimal as possible.
 """
+
 import os
 from pathlib import (
     Path,
