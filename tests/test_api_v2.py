@@ -20,6 +20,7 @@ from sqooler.schemes import MongodbLoginInformation
 from qlued.models import Token, StorageProviderDb
 from qlued.storage_providers import get_storage_provider_from_entry
 
+
 User = get_user_model()
 
 
@@ -250,10 +251,42 @@ class JobSubmissionTest(TestCase):
             "api-2.0.0:get_job_status", kwargs={"backend_name": "fermions"}
         )
 
+        # test what happens with a non confirmed job and something that is non existent
+        req = self.client.get(
+            url,
+            {"job_id": uuid.uuid4().hex, "token": self.token.key},
+        )
+        data = json.loads(req.content)
+        self.assertEqual(req.status_code, 406)
+
+        # test what happens with a no job is provided
+        req = self.client.get(
+            url,
+            {"token": self.token.key},
+        )
+        data = json.loads(req.content)
+        self.assertEqual(req.status_code, 422)
+
+        # use a poor URL with a non-existent backend
+        url = reverse_lazy(
+            "api-2.0.0:get_job_status", kwargs={"backend_name": "wrongname"}
+        )
         req = self.client.get(
             url,
             {"job_id": req_id, "token": self.token.key},
         )
+        self.assertEqual(req.status_code, 404)
+
+        # test the right thing
+        url = reverse_lazy(
+            "api-2.0.0:get_job_status", kwargs={"backend_name": "fermions"}
+        )
+
+        req = self.client.get(
+            url,
+            {"job_id": req_id, "token": self.token.key},
+        )
+
         self.assertEqual(req.status_code, 200)
         data = json.loads(req.content)
         self.assertEqual(data["job_id"], req_id)
@@ -314,7 +347,6 @@ class JobSubmissionTest(TestCase):
         url = reverse_lazy(
             "api-2.0.0:get_job_result", kwargs={"backend_name": "fermions"}
         )
-
         req = self.client.get(
             url,
             {"job_id": req_id, "token": self.token.key},

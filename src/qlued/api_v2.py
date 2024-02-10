@@ -8,13 +8,14 @@ from ninja import NinjaAPI
 from ninja.responses import codes_4xx
 
 from decouple import config
-
 from dropbox.exceptions import ApiError, AuthError
 
 from sqooler.schemes import (
     BackendConfigSchemaOut,
     BackendStatusSchemaOut,
     StatusMsgDict,
+    ResultDict,
+    get_init_status,
 )
 
 from .schemas import (
@@ -61,12 +62,28 @@ def get_config(request, backend_name: str):
         job_response_dict = {
             "job_id": "None",
             "status": "ERROR",
-            "detail": "Unknown back-end! The string should have 1 or three parts separated by `_`!",
+            "detail": (
+                f"Unknown back-end {backend_name}! The string should have 1 or "
+                f"three parts separated by `_`!"
+            ),
             "error_message": "Unknown back-end!",
         }
         return 404, job_response_dict
 
-    storage_provider = get_storage_provider(backend_name)
+    try:
+        storage_provider = get_storage_provider(backend_name)
+    except StorageProviderDb.DoesNotExist:
+        job_response_dict = {
+            "job_id": "None",
+            "status": "ERROR",
+            "detail": (
+                f"Unknown back-end {backend_name}! The string should have 1 or"
+                f" three parts separated by `_`!"
+            ),
+            "error_message": "Unknown back-end!",
+        }
+        return 404, job_response_dict
+
     config_info = storage_provider.get_backend_dict(short_backend)
     # we have to add the URL to the backend configuration
     base_url = config("BASE_URL")
@@ -215,19 +232,15 @@ def get_job_status(request, backend_name: str, job_id: str, token: str):
     A view to check the job status that was previously submitted to the backend.
     """
     # pylint: disable=W0613
-    job_response_dict = {
-        "job_id": "None",
-        "status": "None",
-        "detail": "None",
-        "error_message": "None",
-    }
+    job_response_dict = get_init_status()
+
     # first we need to validate the token and make sure that the user is allowed to look for the job
     try:
         token_object = Token.objects.get(key=token)
     except Token.DoesNotExist:
-        job_response_dict["status"] = "ERROR"
-        job_response_dict["error_message"] = "Invalid credentials!"
-        job_response_dict["detail"] = "Invalid credentials!"
+        job_response_dict.status = "ERROR"
+        job_response_dict.error_message = "Invalid credentials!"
+        job_response_dict.detail = "Invalid credentials!"
         return 401, job_response_dict
 
     username = token_object.user.username
@@ -235,46 +248,26 @@ def get_job_status(request, backend_name: str, job_id: str, token: str):
     backend_names = storage_provider.get_backends()
     short_backend = get_short_backend_name(backend_name)
     if short_backend not in backend_names:
-        job_response_dict["status"] = "ERROR"
-        job_response_dict["detail"] = "Unknown back-end!"
-        job_response_dict["error_message"] = "Unknown back-end!"
+        job_response_dict.status = "ERROR"
+        job_response_dict.detail = "Unknown back-end!"
+        job_response_dict.error_message = "Unknown back-end!"
         return 404, job_response_dict
 
-    # complicated right now
-    # pylint: disable=W0702
-    try:
-        job_response_dict["job_id"] = job_id
-    except:
-        job_response_dict["status"] = "ERROR"
-        job_response_dict["detail"] = "Error loading json data from input request!"
-        job_response_dict["error_message"] = (
-            "Error loading json data from input request!"
-        )
-        return 406, job_response_dict
-    try:
-        # now we download the status json from the backend
-        # this is currently very much backend specific
-        storage_provider = get_storage_provider(backend_name)
+    job_response_dict.job_id = job_id
 
-        job_response_dict = storage_provider.get_status(
-            display_name=short_backend, username=username, job_id=job_id
-        )
+    storage_provider = get_storage_provider(backend_name)
 
-        return 200, job_response_dict
-    except:
-        job_response_dict["status"] = "ERROR"
-        job_response_dict["detail"] = (
-            "Error getting status from database. Maybe invalid JOB ID!"
-        )
-        job_response_dict["error_message"] = (
-            "Error getting status from database. Maybe invalid JOB ID!"
-        )
+    job_response_dict = storage_provider.get_status(
+        display_name=short_backend, username=username, job_id=job_id
+    )
+    if job_response_dict.status == "ERROR":
         return 406, job_response_dict
+    return 200, job_response_dict
 
 
 @api.get(
     "{backend_name}/get_job_result",
-    response={200: dict, codes_4xx: StatusMsgDict},
+    response={200: StatusMsgDict | ResultDict, codes_4xx: StatusMsgDict},
     tags=["Backend"],
     url_name="get_job_result",
 )
@@ -282,7 +275,7 @@ def get_job_result(request, backend_name: str, job_id: str, token: str):
     """
     A view to obtain the results of job that was previously submitted to the backend.
     """
-    # pylint: disable=W0613, R0914, R0911
+    # pylint: disable=W0613
     status_msg_draft = {
         "job_id": "None",
         "status": "None",
@@ -308,35 +301,20 @@ def get_job_result(request, backend_name: str, job_id: str, token: str):
         status_msg_draft["error_message"] = "Unknown back-end!"
         return 404, status_msg_draft
 
-    status_msg_draft["job_id"] = job_id
-    # pylint: disable=W0702
     # request the data from the queue
-    try:
-        status_msg_dict = storage_provider.get_status(
-            display_name=short_backend, username=username, job_id=job_id
-        )
-        status_msg_draft = status_msg_dict.model_dump()
-        if status_msg_draft["status"] != "DONE":
-            return 200, status_msg_draft
-    except:
-        status_msg_draft["detail"] = (
-            "Error getting status from database. Maybe invalid JOB ID!"
-        )
-        status_msg_draft["error_message"] = (
-            "Error getting status from database. Maybe invalid JOB ID!"
-        )
-        return 406, status_msg_draft
+    status_msg_dict = storage_provider.get_status(
+        display_name=short_backend, username=username, job_id=job_id
+    )
+    if status_msg_dict.status == "ERROR":
+        return 406, status_msg_dict
+    if status_msg_dict.status != "DONE":
+        return 200, status_msg_dict
     # and if the status is switched to done, we can also obtain the result
-    try:
-        result_dict = storage_provider.get_result(
-            display_name=short_backend, username=username, job_id=job_id
-        )
+    result_dict = storage_provider.get_result(
+        display_name=short_backend, username=username, job_id=job_id
+    )
 
-        return 200, result_dict
-    except:
-        status_msg_draft["detail"] = "Error getting result from database!"
-        status_msg_draft["error_message"] = "Error getting result from database!"
-        return 406, status_msg_draft
+    return 200, result_dict
 
 
 @api.get(
