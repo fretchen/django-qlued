@@ -8,13 +8,13 @@ from ninja import NinjaAPI
 from ninja.responses import codes_4xx
 
 from decouple import config
-from icecream import ic
 from dropbox.exceptions import ApiError, AuthError
 
 from sqooler.schemes import (
     BackendConfigSchemaOut,
     BackendStatusSchemaOut,
     StatusMsgDict,
+    ResultDict,
 )
 
 from .schemas import (
@@ -61,7 +61,10 @@ def get_config(request, backend_name: str):
         job_response_dict = {
             "job_id": "None",
             "status": "ERROR",
-            "detail": f"Unknown back-end {backend_name}! The string should have 1 or three parts separated by `_`!",
+            "detail": (
+                f"Unknown back-end {backend_name}! The string should have 1 or "
+                f"three parts separated by `_`!"
+            ),
             "error_message": "Unknown back-end!",
         }
         return 404, job_response_dict
@@ -72,7 +75,10 @@ def get_config(request, backend_name: str):
         job_response_dict = {
             "job_id": "None",
             "status": "ERROR",
-            "detail": f"Unknown back-end {backend_name}! The string should have 1 or three parts separated by `_`!",
+            "detail": (
+                f"Unknown back-end {backend_name}! The string should have 1 or"
+                f" three parts separated by `_`!"
+            ),
             "error_message": "Unknown back-end!",
         }
         return 404, job_response_dict
@@ -253,27 +259,18 @@ def get_job_status(request, backend_name: str, job_id: str, token: str):
     job_response_dict["job_id"] = job_id
 
     storage_provider = get_storage_provider(backend_name)
-    # we might be able to get rid of this with the
-    # next version of `sqooler`
-    try:
-        job_response_dict = storage_provider.get_status(
-            display_name=short_backend, username=username, job_id=job_id
-        )
-        return 200, job_response_dict
-    except:
-        job_response_dict["status"] = "ERROR"
-        job_response_dict["detail"] = (
-            "Error getting status from database. Maybe invalid JOB ID!"
-        )
-        job_response_dict["error_message"] = (
-            "Error getting status from database. Maybe invalid JOB ID!"
-        )
+
+    job_response_dict = storage_provider.get_status(
+        display_name=short_backend, username=username, job_id=job_id
+    )
+    if job_response_dict.status == "ERROR":
         return 406, job_response_dict
+    return 200, job_response_dict
 
 
 @api.get(
     "{backend_name}/get_job_result",
-    response={200: dict, codes_4xx: StatusMsgDict},
+    response={200: StatusMsgDict | ResultDict, codes_4xx: StatusMsgDict},
     tags=["Backend"],
     url_name="get_job_result",
 )
@@ -281,7 +278,7 @@ def get_job_result(request, backend_name: str, job_id: str, token: str):
     """
     A view to obtain the results of job that was previously submitted to the backend.
     """
-    # pylint: disable=W0613, R0914, R0911
+    # pylint: disable=W0613
     status_msg_draft = {
         "job_id": "None",
         "status": "None",
@@ -307,36 +304,20 @@ def get_job_result(request, backend_name: str, job_id: str, token: str):
         status_msg_draft["error_message"] = "Unknown back-end!"
         return 404, status_msg_draft
 
-    status_msg_draft["job_id"] = job_id
-    # pylint: disable=W0702
     # request the data from the queue
-    try:
-        status_msg_dict = storage_provider.get_status(
-            display_name=short_backend, username=username, job_id=job_id
-        )
-        status_msg_draft = status_msg_dict.model_dump()
-        if status_msg_draft["status"] != "DONE":
-            return 200, status_msg_draft
-    except:
-        status_msg_draft["detail"] = (
-            "Error getting status from database. Maybe invalid JOB ID!"
-        )
-        status_msg_draft["error_message"] = (
-            "Error getting status from database. Maybe invalid JOB ID!"
-        )
-        return 406, status_msg_draft
+    status_msg_dict = storage_provider.get_status(
+        display_name=short_backend, username=username, job_id=job_id
+    )
+    if status_msg_dict.status == "ERROR":
+        return 406, status_msg_dict
+    if status_msg_dict.status != "DONE":
+        return 200, status_msg_dict
     # and if the status is switched to done, we can also obtain the result
-    # this can be done in the same way as the status once we have sqooler 0.5.0
-    try:
-        result_dict = storage_provider.get_result(
-            display_name=short_backend, username=username, job_id=job_id
-        )
+    result_dict = storage_provider.get_result(
+        display_name=short_backend, username=username, job_id=job_id
+    )
 
-        return 200, result_dict
-    except:
-        status_msg_draft["detail"] = "Error getting result from database!"
-        status_msg_draft["error_message"] = "Error getting result from database!"
-        return 406, status_msg_draft
+    return 200, result_dict
 
 
 @api.get(

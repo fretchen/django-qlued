@@ -20,8 +20,6 @@ from sqooler.schemes import MongodbLoginInformation
 from qlued.models import Token, StorageProviderDb
 from qlued.storage_providers import get_storage_provider_from_entry
 
-from icecream import ic
-
 
 User = get_user_model()
 
@@ -349,7 +347,6 @@ class JobSubmissionTest(TestCase):
         url = reverse_lazy(
             "api-2.0.0:get_job_result", kwargs={"backend_name": "fermions"}
         )
-
         req = self.client.get(
             url,
             {"job_id": req_id, "token": self.token.key},

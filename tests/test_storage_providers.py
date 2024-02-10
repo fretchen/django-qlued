@@ -2,13 +2,9 @@
 The tests for the main storage_provider functions
 """
 
-import uuid
 import shutil
 
-from pydantic import ValidationError
 from decouple import config
-
-from icecream import ic
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -21,7 +17,6 @@ from qlued.storage_providers import (
     get_storage_provider,
     get_storage_provider_from_entry,
 )
-from qlued.models import StorageProviderDb
 
 User = get_user_model()
 
