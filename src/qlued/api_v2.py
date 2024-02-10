@@ -232,7 +232,6 @@ def get_job_status(request, backend_name: str, job_id: str, token: str):
     A view to check the job status that was previously submitted to the backend.
     """
     # pylint: disable=W0613
-    get_init_status
     job_response_dict = get_init_status()
 
     # first we need to validate the token and make sure that the user is allowed to look for the job
