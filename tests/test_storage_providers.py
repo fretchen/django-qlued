@@ -13,7 +13,7 @@ from icecream import ic
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from sqooler.storage_providers import LocalProviderExtended as LocalProvider
+from sqooler.storage_providers.local import LocalProviderExtended as LocalProvider
 from sqooler.schemes import LocalLoginInformation, BackendConfigSchemaIn
 from qlued.models import StorageProviderDb
 

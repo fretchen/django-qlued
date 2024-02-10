@@ -10,7 +10,7 @@ from pydantic import ValidationError
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from sqooler.storage_providers import MongodbProviderExtended as MongodbProvider
+from sqooler.storage_providers.mongodb import MongodbProviderExtended as MongodbProvider
 from sqooler.schemes import MongodbLoginInformation
 
 from qlued.storage_providers import get_short_backend_name

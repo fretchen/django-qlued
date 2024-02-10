@@ -15,7 +15,7 @@ from django.test import TestCase
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 
-from sqooler.storage_providers import MongodbProviderExtended as MongodbProvider
+from sqooler.storage_providers.mongodb import MongodbProviderExtended as MongodbProvider
 from sqooler.schemes import MongodbLoginInformation
 from qlued.models import Token, StorageProviderDb
 from qlued.storage_providers import get_storage_provider_from_entry
