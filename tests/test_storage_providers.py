@@ -184,7 +184,7 @@ class StorageProvideTests(TestCase):
 
         # make sure that the name is unique
         with self.assertRaises(IntegrityError):
-            local_entry2 = StorageProviderDb.objects.create(
+            StorageProviderDb.objects.create(
                 storage_type="local",
                 name="localtest342",
                 owner=self.user,
@@ -235,7 +235,7 @@ class StorageProvideTests(TestCase):
 
         # make sure that the name is unique
         with self.assertRaises(IntegrityError):
-            local_entry2 = StorageProviderDb.objects.create(
+            StorageProviderDb.objects.create(
                 storage_type="mongodb",
                 name="localtest342",
                 owner=self.user,
