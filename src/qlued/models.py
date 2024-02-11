@@ -2,6 +2,8 @@
 The models that define our sql tables for the app.
 """
 
+import re
+
 from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -89,6 +91,15 @@ class StorageProviderDb(models.Model):
                 {
                     "name": "The name of the storage provider cannot contain spaces or underscores."
                 }
+            )
+
+        # transform the name to lowercase
+        self.name = self.name.lower()
+
+        # make sure that the name only contains alphanumeric characters
+        if not re.match("^[a-z0-9]+$", self.name):
+            raise ValidationError(
+                "The name of the storage provider can only contain lowercase alphanumeric characters."
             )
         # make sure that the login dict is valid
         if self.storage_type == "dropbox":

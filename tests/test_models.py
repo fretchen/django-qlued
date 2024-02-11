@@ -122,6 +122,17 @@ class StorageProviderDbCreationTest(TestCase):
         with self.assertRaises(ValidationError):
             mongo_stupid.full_clean()
 
+        # make sure that the name cannot contain special characters
+        mongo_stupid = StorageProviderDb.objects.create(
+            storage_type="mongodb",
+            name="fsjih!/3",
+            owner=self.user,
+            description="MongoDB storage provider for tests",
+            login=login_dict,
+        )
+        with self.assertRaises(ValidationError):
+            mongo_stupid.full_clean()
+
         # make sure that we cannot create a second storageprovide with the same name
         with self.assertRaises(IntegrityError):
             _ = StorageProviderDb.objects.create(
