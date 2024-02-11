@@ -73,9 +73,9 @@ class StorageProviderDbCreationTest(TestCase):
         mongodb_password = config("MONGODB_PASSWORD")
         mongodb_database_url = config("MONGODB_DATABASE_URL")
         login_dict = {
-            "username": mongodb_username,
-            "password": mongodb_password,
-            "database_url": mongodb_database_url,
+            "mongodb_username": mongodb_username,
+            "mongodb_password": mongodb_password,
+            "mongodb_database_url": mongodb_database_url,
         }
 
         # create the storage entry in the models
