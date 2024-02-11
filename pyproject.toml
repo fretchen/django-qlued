@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-qlued"
-version = "0.1.1a0"
+version = "0.1.2"
 description = "Django packages that enables validated cloud access to quantum hardware."
 authors = ["fretchen <fred.jendrzejewski@gmail.com>"]
 license = "Apache-2.0"
