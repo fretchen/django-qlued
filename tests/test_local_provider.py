@@ -84,6 +84,18 @@ class LocalProviderTest(TestCase):
             login_info = LocalLoginInformation(**poor_login_dict)
             LocalProvider(login_info, mongodb_entry.name)
 
+        # create the storage entry in the models
+        local_entry = StorageProviderDb.objects.create(
+            storage_type="local",
+            name="localtest342",
+            owner=self.user,
+            description="Local storage provider for tests",
+            login=poor_login_dict,
+            is_active=True,
+        )
+        with self.assertRaises(ValidationError):
+            local_entry.full_clean()
+
     def test_not_active(self):
         """
         Test that we cannot work with the provider if it is not active.

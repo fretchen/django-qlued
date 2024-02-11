@@ -6,6 +6,12 @@ from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 
+from sqooler.schemes import (
+    MongodbLoginInformation,
+    DropboxLoginInformation,
+    LocalLoginInformation,
+)
+
 
 class Token(models.Model):
     """
@@ -83,4 +89,16 @@ class StorageProviderDb(models.Model):
                 {
                     "name": "The name of the storage provider cannot contain spaces or underscores."
                 }
+            )
+        # make sure that the login dict is valid
+        if self.storage_type == "dropbox":
+
+            DropboxLoginInformation(**self.login)
+        elif self.storage_type == "mongodb":
+            MongodbLoginInformation(**self.login)
+        elif self.storage_type == "local":
+            LocalLoginInformation(**self.login)
+        else:
+            raise ValidationError(
+                {"storage_type": f"Value '{self.storage_type}' is not a valid choice."}
             )

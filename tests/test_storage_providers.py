@@ -8,9 +8,13 @@ from decouple import config
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.db import IntegrityError
 
 from sqooler.storage_providers.local import LocalProviderExtended as LocalProvider
 from sqooler.schemes import LocalLoginInformation, BackendConfigSchemaIn
+
+from pydantic import ValidationError
+
 from qlued.models import StorageProviderDb
 
 from qlued.storage_providers import (
@@ -33,6 +37,7 @@ class StorageProvideTests(TestCase):
         user = User.objects.create(username=self.username)
         user.set_password(self.password)
         user.save()
+        self.user = user
 
         # add the first storage provider
         base_path = "storage-3"
@@ -140,3 +145,101 @@ class StorageProvideTests(TestCase):
 
         full_backend_name = "local2_singlequdit_simulator"
         storage_provider = get_storage_provider(full_backend_name)
+
+    def test_add_local_provider(self):
+        """
+        Test that we can add a local provider
+        """
+        # create the storage entry in the models with a poor login dict
+        poor_login_dict = {
+            "app_key_t": "test",
+            "app_secret": "test",
+            "refresh_token": "test",
+        }
+        local_entry = StorageProviderDb.objects.create(
+            storage_type="local",
+            name="localtest342",
+            owner=self.user,
+            description="Local storage provider for tests",
+            login=poor_login_dict,
+            is_active=True,
+        )
+        with self.assertRaises(ValidationError):
+            local_entry.full_clean()
+
+        local_entry.delete()
+
+        # create the storage entry in the models
+        login_dict = {"base_path": "test"}
+        local_entry = StorageProviderDb.objects.create(
+            storage_type="local",
+            name="localtest342",
+            owner=self.user,
+            description="Local storage provider for tests",
+            login=login_dict,
+            is_active=True,
+        )
+
+        local_entry.full_clean()
+
+        # make sure that the name is unique
+        with self.assertRaises(IntegrityError):
+            StorageProviderDb.objects.create(
+                storage_type="local",
+                name="localtest342",
+                owner=self.user,
+                description="Local storage provider for tests",
+                login=login_dict,
+                is_active=True,
+            )
+
+    def test_add_mongodb_provider(self):
+        """
+        Test that we can add a MongoDB provider
+        """
+        # create the storage entry in the models with a poor login dict
+        poor_login_dict = {
+            "app_key_t": "test",
+            "app_secret": "test",
+            "refresh_token": "test",
+        }
+        local_entry = StorageProviderDb.objects.create(
+            storage_type="mongodb",
+            name="localtest342",
+            owner=self.user,
+            description="Local storage provider for tests",
+            login=poor_login_dict,
+            is_active=True,
+        )
+        with self.assertRaises(ValidationError):
+            local_entry.full_clean()
+
+        local_entry.delete()
+
+        # create the storage entry in the models
+        login_dict = {
+            "mongodb_database_url": "test",
+            "mongodb_username": "test",
+            "mongodb_password": "test",
+        }
+        local_entry = StorageProviderDb.objects.create(
+            storage_type="mongodb",
+            name="localtest342",
+            owner=self.user,
+            description="Local storage provider for tests",
+            login=login_dict,
+            is_active=True,
+        )
+
+        local_entry.full_clean()
+
+        # make sure that the name is unique
+        with self.assertRaises(IntegrityError):
+            StorageProviderDb.objects.create(
+                storage_type="mongodb",
+                name="localtest342",
+                owner=self.user,
+                description="Local storage provider for tests",
+                login=login_dict,
+                is_active=True,
+            )
