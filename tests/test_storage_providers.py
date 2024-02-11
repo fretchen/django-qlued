@@ -192,3 +192,54 @@ class StorageProvideTests(TestCase):
                 login=login_dict,
                 is_active=True,
             )
+
+    def test_add_mongodb_provider(self):
+        """
+        Test that we can add a MongoDB provider
+        """
+        # create the storage entry in the models with a poor login dict
+        poor_login_dict = {
+            "app_key_t": "test",
+            "app_secret": "test",
+            "refresh_token": "test",
+        }
+        local_entry = StorageProviderDb.objects.create(
+            storage_type="mongodb",
+            name="localtest342",
+            owner=self.user,
+            description="Local storage provider for tests",
+            login=poor_login_dict,
+            is_active=True,
+        )
+        with self.assertRaises(ValidationError):
+            local_entry.full_clean()
+
+        local_entry.delete()
+
+        # create the storage entry in the models
+        login_dict = {
+            "mongodb_database_url": "test",
+            "mongodb_username": "test",
+            "mongodb_password": "test",
+        }
+        local_entry = StorageProviderDb.objects.create(
+            storage_type="mongodb",
+            name="localtest342",
+            owner=self.user,
+            description="Local storage provider for tests",
+            login=login_dict,
+            is_active=True,
+        )
+
+        local_entry.full_clean()
+
+        # make sure that the name is unique
+        with self.assertRaises(IntegrityError):
+            local_entry2 = StorageProviderDb.objects.create(
+                storage_type="mongodb",
+                name="localtest342",
+                owner=self.user,
+                description="Local storage provider for tests",
+                login=login_dict,
+                is_active=True,
+            )
