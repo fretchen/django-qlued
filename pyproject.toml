@@ -15,7 +15,7 @@ classifiers = ["Development Status :: 4 - Beta","Framework :: Django",]
 python = "^3.10"
 django-ninja = "^1.1.0"
 python-decouple = "^3.8"
-pytz = "^2023.3.post1"
+pytz = "^2024.1"
 whitenoise = "^6.6.0"
 sqooler = "^0.5.0"
 
