@@ -99,7 +99,12 @@ class StorageProviderDb(models.Model):
         # make sure that the name only contains alphanumeric characters
         if not re.match("^[a-z0-9]+$", self.name):
             raise ValidationError(
-                "The name of the storage provider can only contain lowercase alphanumeric characters."
+                {
+                    "name": (
+                        "The name of the storage provider can only "
+                        "contain lowercase alphanumeric characters."
+                    )
+                }
             )
         # make sure that the login dict is valid
         if self.storage_type == "dropbox":
