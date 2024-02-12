@@ -9,13 +9,11 @@ from decouple import config
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.db import IntegrityError
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from sqooler.storage_providers.local import LocalProviderExtended as LocalProvider
 from sqooler.schemes import LocalLoginInformation, BackendConfigSchemaIn
 
-from django.core.exceptions import ValidationError as DjangoValidationError
-
-from pydantic import ValidationError as PydancticValidationError
 
 from qlued.models import StorageProviderDb
 
