@@ -6,7 +6,9 @@ import re
 
 from django.conf import settings
 from django.db import models
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError as DjangoValidationError
+
+from pydantic import ValidationError as PydanticValidationError
 
 from sqooler.schemes import (
     MongodbLoginInformation,
@@ -82,12 +84,12 @@ class StorageProviderDb(models.Model):
 
     def clean(self):
         if self.storage_type not in dict(self.STORAGE_TYPE_CHOICES):
-            raise ValidationError(
+            raise DjangoValidationError(
                 {"storage_type": f"Value '{self.storage_type}' is not a valid choice."}
             )
         # make sure that the name does not contain any spaces or underscores.
         if " " in self.name or "_" in self.name:
-            raise ValidationError(
+            raise DjangoValidationError(
                 {
                     "name": "The name of the storage provider cannot contain spaces or underscores."
                 }
@@ -98,7 +100,7 @@ class StorageProviderDb(models.Model):
 
         # make sure that the name only contains alphanumeric characters
         if not re.match("^[a-z0-9]+$", self.name):
-            raise ValidationError(
+            raise DjangoValidationError(
                 {
                     "name": (
                         "The name of the storage provider can only "
@@ -108,13 +110,27 @@ class StorageProviderDb(models.Model):
             )
         # make sure that the login dict is valid
         if self.storage_type == "dropbox":
-
-            DropboxLoginInformation(**self.login)
+            try:
+                DropboxLoginInformation(**self.login)
+            except PydanticValidationError as err:
+                raise DjangoValidationError(
+                    {"login": "Poor login dict for dropbox."}
+                ) from err
         elif self.storage_type == "mongodb":
-            MongodbLoginInformation(**self.login)
+            try:
+                MongodbLoginInformation(**self.login)
+            except PydanticValidationError as err:
+                raise DjangoValidationError(
+                    {"login": "Poor login dict for mongoDB."}
+                ) from err
         elif self.storage_type == "local":
-            LocalLoginInformation(**self.login)
+            try:
+                LocalLoginInformation(**self.login)
+            except PydanticValidationError as err:
+                raise DjangoValidationError(
+                    {"login": "Poor login dict for local provider."}
+                ) from err
         else:
-            raise ValidationError(
+            raise DjangoValidationError(
                 {"storage_type": f"Value '{self.storage_type}' is not a valid choice."}
             )

@@ -6,10 +6,11 @@ import uuid
 import shutil
 
 from decouple import config
-from pydantic import ValidationError
+from pydantic import ValidationError as PydanticValidationError
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from sqooler.storage_providers.local import LocalProviderExtended as LocalProvider
 from sqooler.schemes import LocalLoginInformation, BackendConfigSchemaIn
@@ -80,7 +81,7 @@ class LocalProviderTest(TestCase):
             "app_secret": "test",
             "refresh_token": "test",
         }
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(PydanticValidationError):
             login_info = LocalLoginInformation(**poor_login_dict)
             LocalProvider(login_info, mongodb_entry.name)
 
@@ -93,7 +94,7 @@ class LocalProviderTest(TestCase):
             login=poor_login_dict,
             is_active=True,
         )
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(DjangoValidationError):
             local_entry.full_clean()
 
     def test_not_active(self):
