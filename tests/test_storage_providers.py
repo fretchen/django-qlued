@@ -9,11 +9,11 @@ from decouple import config
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.db import IntegrityError
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from sqooler.storage_providers.local import LocalProviderExtended as LocalProvider
 from sqooler.schemes import LocalLoginInformation, BackendConfigSchemaIn
 
-from pydantic import ValidationError
 
 from qlued.models import StorageProviderDb
 
@@ -164,7 +164,7 @@ class StorageProvideTests(TestCase):
             login=poor_login_dict,
             is_active=True,
         )
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(DjangoValidationError):
             local_entry.full_clean()
 
         local_entry.delete()
@@ -211,7 +211,7 @@ class StorageProvideTests(TestCase):
             login=poor_login_dict,
             is_active=True,
         )
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(DjangoValidationError):
             local_entry.full_clean()
 
         local_entry.delete()
