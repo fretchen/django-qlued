@@ -200,9 +200,11 @@ class BackendsWithMultipleLocalProvidersTest(TestCase):
         local_entry.save()
 
         # create a dummy config for the required fermions
-        backend_name = "fermions"
+        dummy_id = uuid.uuid4().hex[:5]
+        backend_name = f"dummy{dummy_id}"
+        self.display_name = backend_name
         fermions_config = {
-            "display_name": "fermions",
+            "display_name": backend_name,
             "name": "alqor_fermionic-tweezer_simulator",
             "supported_instructions": [],
             "wire_order": "interleaved",
@@ -213,7 +215,7 @@ class BackendsWithMultipleLocalProvidersTest(TestCase):
             "version": "0.0.1",
             "max_shots": 100,
             "max_experiments": 100,
-            "cold_atom_type": "fermions",
+            "cold_atom_type": "fermion",
             "description": "First device for tests",
             "operational": True,
         }
@@ -253,7 +255,7 @@ class BackendsWithMultipleLocalProvidersTest(TestCase):
             "version": "0.0.1",
             "max_shots": 100,
             "max_experiments": 100,
-            "cold_atom_type": "fermions",
+            "cold_atom_type": "spin",
             "description": "Second device for tests",
             "operational": True,
         }
@@ -287,5 +289,5 @@ class BackendsWithMultipleLocalProvidersTest(TestCase):
         storage_provider = LocalProvider(login_info, db_entry.name)
 
         # now get the backend config
-        config_info = storage_provider.get_backend_dict(display_name="fermions")
-        assert config_info.backend_name == "local1_fermions_simulator"
+        config_info = storage_provider.get_backend_dict(display_name=self.display_name)
+        assert config_info.backend_name == f"local1_{self.display_name}_simulator"

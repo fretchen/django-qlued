@@ -3,7 +3,7 @@ The tests for the main storage_provider functions
 """
 
 import shutil
-
+import uuid
 from decouple import config
 
 from django.contrib.auth import get_user_model
@@ -57,9 +57,11 @@ class StorageProvideTests(TestCase):
         local_entry.save()
 
         # create a dummy config for the required fermions
-        backend_name = "fermions"
+
+        dummy_id = uuid.uuid4().hex[:5]
+        backend_name = f"dummy{dummy_id}"
         fermions_config = {
-            "display_name": "fermions",
+            "display_name": backend_name,
             "name": "alqor_fermionic-tweezer_simulator",
             "supported_instructions": [],
             "wire_order": "interleaved",
@@ -70,7 +72,7 @@ class StorageProvideTests(TestCase):
             "version": "0.0.1",
             "max_shots": 100,
             "max_experiments": 100,
-            "cold_atom_type": "fermions",
+            "cold_atom_type": "fermion",
             "description": "First device for tests",
             "operational": True,
         }
@@ -110,7 +112,7 @@ class StorageProvideTests(TestCase):
             "version": "0.0.1",
             "max_shots": 100,
             "max_experiments": 100,
-            "cold_atom_type": "fermions",
+            "cold_atom_type": "spin",
             "description": "Second device for tests",
             "operational": True,
         }
