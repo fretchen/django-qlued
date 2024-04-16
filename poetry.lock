@@ -1640,13 +1640,13 @@ doc = ["sphinx"]
 
 [[package]]
 name = "sqooler"
-version = "0.6.2"
+version = "0.6.3"
 description = "Code that enables validated cloud access to quantum hardware (simulators)"
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "sqooler-0.6.2-py3-none-any.whl", hash = "sha256:eaec47f918c9e9e933b0062fe824d560bcd72761de7d8b958107724530e83a54"},
-    {file = "sqooler-0.6.2.tar.gz", hash = "sha256:51c0a1d500e8d2ef97cbf008d9f71b59959d7ccd7cd2bd67297dd6176d4db524"},
+    {file = "sqooler-0.6.3-py3-none-any.whl", hash = "sha256:f38568e3d6e99d2c63e2c7abf21e05cacb1dbb396e05952e418115ebce1c50fa"},
+    {file = "sqooler-0.6.3.tar.gz", hash = "sha256:14f9ee7ad9f8336ebd604b7e05c7c7ce41ebafe11e1536e55a6c70a2c7211edc"},
 ]
 
 [package.dependencies]
@@ -1842,4 +1842,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "90c193bfb49eba40b0ecc9fc13b953df88db26d6f5365c0bbba92ab75222442e"
+content-hash = "dee68c851d3b266058e459c7096ddd34818ff5b40c0eb8d2a21ed6a1fc72a789"
