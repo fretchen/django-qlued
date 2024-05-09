@@ -45,7 +45,7 @@ jobs:
           poetry install
       - name: Run Tests
         run: |
-          poetry run python runtests.py
+          poetry run runtests
 
   lint:
     env:
@@ -77,6 +77,7 @@ jobs:
           export PYTHONPATH=$PYTHONPATH:$PWD
           poetry run pylint --load-plugins pylint_django --django-settings-module=tests.test_settings src
           poetry run pylint --load-plugins pylint_django --django-settings-module=tests.test_settings tests
+          poetry run pylint runtests.py
       - name: Run black
         run: |
           poetry run black --check .
@@ -84,3 +85,4 @@ jobs:
         run: |
           poetry run mypy src
           poetry run mypy tests
+          poetry run mypy runtests.py
