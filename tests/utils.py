@@ -1,9 +1,11 @@
 """
 Some helper functions for the tests.
 """
+
 from typing import Tuple
 import uuid
 from sqooler.schemes import BackendConfigSchemaIn
+
 
 def get_dummy_config(sign: bool = True) -> Tuple[str, BackendConfigSchemaIn]:
     """

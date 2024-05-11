@@ -121,7 +121,7 @@ class BackendConfigTest(TestCase):
         self.assertEqual(data["backend_version"], "0.1")
 
         # get the operational status and see if it is present
-        
+
         self.assertIn("operational", data)
 
         # get the pending jobs
@@ -420,7 +420,7 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
         local_entry.save()
 
         # create a dummy config for the required single qudit
-        _, config_dict =  get_dummy_config(sign=False)
+        _, config_dict = get_dummy_config(sign=False)
         config_dict.display_name = "singlequdit"
         local_storage = get_storage_provider_from_entry(local_entry)
 
