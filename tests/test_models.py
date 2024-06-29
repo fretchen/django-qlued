@@ -2,18 +2,17 @@
 Test the models of this app.
 """
 
-from datetime import datetime
 import uuid
+from datetime import datetime
 
 import pytz
-
 from decouple import config
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
+from django.test import TestCase
 
-from qlued.models import Token, StorageProviderDb
+from qlued.models import StorageProviderDb, Token
 
 User = get_user_model()
 
