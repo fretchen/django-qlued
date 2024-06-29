@@ -11,12 +11,13 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 from sqooler.schemes import BackendConfigSchemaIn, LocalLoginInformation
-from sqooler.storage_providers.local import \
-    LocalProviderExtended as LocalProvider
+from sqooler.storage_providers.local import LocalProviderExtended as LocalProvider
 
 from qlued.models import StorageProviderDb
-from qlued.storage_providers import (get_storage_provider,
-                                     get_storage_provider_from_entry)
+from qlued.storage_providers import (
+    get_storage_provider,
+    get_storage_provider_from_entry,
+)
 
 User = get_user_model()
 

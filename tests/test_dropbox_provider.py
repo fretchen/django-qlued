@@ -9,8 +9,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from pydantic import ValidationError
 from sqooler.schemes import DropboxLoginInformation
-from sqooler.storage_providers.dropbox import \
-    DropboxProviderExtended as DropboxProvider
+from sqooler.storage_providers.dropbox import DropboxProviderExtended as DropboxProvider
 
 from qlued.models import StorageProviderDb
 
