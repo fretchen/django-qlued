@@ -1,24 +1,24 @@
 """
-The models that define our tests for the api in version 1.
+The models that define our tests for the api in version 2.
 """
 
 import json
-from datetime import datetime
-import uuid
 import shutil
+import uuid
+from datetime import datetime
 
 import pytz
-
-
 from decouple import config
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse_lazy
-from django.contrib.auth import get_user_model
-
-from sqooler.storage_providers.mongodb import MongodbProviderExtended as MongodbProvider
 from sqooler.schemes import MongodbLoginInformation
-from qlued.models import Token, StorageProviderDb
+from sqooler.storage_providers.mongodb import \
+    MongodbProviderExtended as MongodbProvider
+
+from qlued.models import StorageProviderDb, Token
 from qlued.storage_providers import get_storage_provider_from_entry
+
 from .utils import get_dummy_config
 
 User = get_user_model()

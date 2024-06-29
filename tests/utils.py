@@ -2,8 +2,9 @@
 Some helper functions for the tests.
 """
 
-from typing import Tuple
 import uuid
+from typing import Tuple
+
 from sqooler.schemes import BackendConfigSchemaIn
 
 

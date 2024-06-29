@@ -3,14 +3,14 @@ The tests for the storage provider
 """
 
 import uuid
-from pydantic import ValidationError
+
 from decouple import config
-
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-
-from sqooler.storage_providers.dropbox import DropboxProviderExtended as DropboxProvider
+from django.test import TestCase
+from pydantic import ValidationError
 from sqooler.schemes import DropboxLoginInformation
+from sqooler.storage_providers.dropbox import \
+    DropboxProviderExtended as DropboxProvider
 
 from qlued.models import StorageProviderDb
 
@@ -96,15 +96,15 @@ class DropboxProvideTest(TestCase):
         # make sure that this did not add the _id field to the dict
         self.assertFalse("_id" in test_content)
 
-        test_result = storage_provider.get_file_content(storage_path, job_id)
+        test_result = storage_provider.get(storage_path, job_id)
 
         self.assertDictEqual(test_content, test_result)
 
         # move it and get it back
         second_path = "test_folder_2"
-        storage_provider.move_file(storage_path, second_path, job_id)
-        test_result = storage_provider.get_file_content(second_path, job_id)
+        storage_provider.move(storage_path, second_path, job_id)
+        test_result = storage_provider.get(second_path, job_id)
         self.assertDictEqual(test_content, test_result)
 
         # clean up our mess
-        storage_provider.delete_file(second_path, job_id)
+        storage_provider.delete(second_path, job_id)

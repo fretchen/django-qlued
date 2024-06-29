@@ -4,23 +4,19 @@ The tests for the main storage_provider functions
 
 import shutil
 import uuid
+
 from decouple import config
-
 from django.contrib.auth import get_user_model
-from django.test import TestCase
-from django.db import IntegrityError
 from django.core.exceptions import ValidationError as DjangoValidationError
-
-from sqooler.storage_providers.local import LocalProviderExtended as LocalProvider
-from sqooler.schemes import LocalLoginInformation, BackendConfigSchemaIn
-
+from django.db import IntegrityError
+from django.test import TestCase
+from sqooler.schemes import BackendConfigSchemaIn, LocalLoginInformation
+from sqooler.storage_providers.local import \
+    LocalProviderExtended as LocalProvider
 
 from qlued.models import StorageProviderDb
-
-from qlued.storage_providers import (
-    get_storage_provider,
-    get_storage_provider_from_entry,
-)
+from qlued.storage_providers import (get_storage_provider,
+                                     get_storage_provider_from_entry)
 
 User = get_user_model()
 

@@ -2,25 +2,21 @@
 The tests for the local storage provider
 """
 
-import uuid
 import shutil
+import uuid
 
 from decouple import config
-from pydantic import ValidationError as PydanticValidationError
-
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.core.exceptions import ValidationError as DjangoValidationError
-
-from sqooler.storage_providers.local import LocalProviderExtended as LocalProvider
-from sqooler.schemes import LocalLoginInformation, BackendConfigSchemaIn
-
-from qlued.storage_providers import (
-    get_short_backend_name,
-    get_storage_provider_from_entry,
-)
+from django.test import TestCase
+from pydantic import ValidationError as PydanticValidationError
+from sqooler.schemes import BackendConfigSchemaIn, LocalLoginInformation
+from sqooler.storage_providers.local import \
+    LocalProviderExtended as LocalProvider
 
 from qlued.models import StorageProviderDb
+from qlued.storage_providers import (get_short_backend_name,
+                                     get_storage_provider_from_entry)
 
 User = get_user_model()
 
@@ -115,11 +111,11 @@ class LocalProviderTest(TestCase):
         with self.assertRaises(ValueError):
             storage_provider.upload(test_content, storage_path, job_id)
         with self.assertRaises(ValueError):
-            storage_provider.get_file_content(storage_path, job_id)
+            storage_provider.get(storage_path, job_id)
         with self.assertRaises(ValueError):
-            storage_provider.move_file(storage_path, second_path, job_id)
+            storage_provider.move(storage_path, second_path, job_id)
         with self.assertRaises(ValueError):
-            storage_provider.delete_file(second_path, job_id)
+            storage_provider.delete(second_path, job_id)
 
     def test_upload_etc(self):
         """
@@ -137,18 +133,18 @@ class LocalProviderTest(TestCase):
 
         job_id = uuid.uuid4().hex[:24]
         storage_provider.upload(test_content, storage_path, job_id)
-        test_result = storage_provider.get_file_content(storage_path, job_id)
+        test_result = storage_provider.get(storage_path, job_id)
 
         self.assertDictEqual(test_content, test_result)
 
         # move it and get it back
         second_path = "test/subcollection_2"
-        storage_provider.move_file(storage_path, second_path, job_id)
-        test_result = storage_provider.get_file_content(second_path, job_id)
+        storage_provider.move(storage_path, second_path, job_id)
+        test_result = storage_provider.get(second_path, job_id)
         self.assertDictEqual(test_content, test_result)
 
         # clean up our mess
-        storage_provider.delete_file(second_path, job_id)
+        storage_provider.delete(second_path, job_id)
 
     def test_backend_name(self):
         """
