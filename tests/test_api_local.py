@@ -109,4 +109,4 @@ class BackendConfigTest(TestCase):
         self.assertEqual(data["operational"], True)
 
         # and remove the config
-        local_storage._delete_config(backend_name)
+        local_storage._delete_config(backend_name) # pylint: disable=protected-access
