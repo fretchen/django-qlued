@@ -5,9 +5,7 @@ always attempt to make them as minimal as possible.
 """
 
 import os
-from pathlib import (
-    Path,
-)
+from pathlib import Path
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(__file__).resolve().parent.parent

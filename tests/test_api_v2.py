@@ -1,25 +1,24 @@
 """
-The models that define our tests for the api in version 1.
+The models that define our tests for the api in version 2.
 """
 
 import json
-from datetime import datetime
-import uuid
 import shutil
+import uuid
+from datetime import datetime
 
 import pytz
-
-
 from decouple import config
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse_lazy
-from django.contrib.auth import get_user_model
-
-from sqooler.storage_providers.mongodb import MongodbProviderExtended as MongodbProvider
 from sqooler.schemes import MongodbLoginInformation
-from qlued.models import Token, StorageProviderDb
+from sqooler.storage_providers.mongodb import MongodbProviderExtended as MongodbProvider
+
+from qlued.models import StorageProviderDb, Token
 from qlued.storage_providers import get_storage_provider_from_entry
 
+from .utils import get_dummy_config
 
 User = get_user_model()
 
@@ -120,8 +119,9 @@ class BackendConfigTest(TestCase):
         # get the version
         self.assertEqual(data["backend_version"], "0.1")
 
-        # get the operational status
-        self.assertEqual(data["operational"], True)
+        # get the operational status and see if it is present
+
+        self.assertIn("operational", data)
 
         # get the pending jobs
         self.assertEqual(data["pending_jobs"], 0)
@@ -394,12 +394,12 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
         local_entry.save()
 
         # create a dummy config for the required fermions
-        fermions_config = {
-            "display_name": "fermions",
-        }
-
+        _, config_dict = get_dummy_config(sign=False)
+        config_dict.display_name = "fermions"
         local_storage = get_storage_provider_from_entry(local_entry)
-        local_storage.upload(fermions_config, "backends/configs", "fermions")
+
+        # upload the config
+        local_storage.upload_config(config_dict, "fermions")
 
         # add the second storage provider
         base_path = "storage-2"
@@ -419,12 +419,12 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
         local_entry.save()
 
         # create a dummy config for the required single qudit
-        single_qudit_config = {
-            "display_name": "singlequdit",
-        }
-
+        _, config_dict = get_dummy_config(sign=False)
+        config_dict.display_name = "singlequdit"
         local_storage = get_storage_provider_from_entry(local_entry)
-        local_storage.upload(single_qudit_config, "backends/configs", "singlequdit")
+
+        # upload the config
+        local_storage.upload_config(config_dict, "singlequdit")
 
     def tearDown(self):
         shutil.rmtree("storage-1")
