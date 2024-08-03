@@ -86,3 +86,8 @@ jobs:
           poetry run mypy src
           poetry run mypy tests
           poetry run mypy runtests.py
+      - name: Run isort
+        run: |
+          poetry run isort --check-only tests
+          poetry run isort --check-only src
+      

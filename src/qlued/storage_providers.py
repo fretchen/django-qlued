@@ -3,19 +3,17 @@ The module that contains all the necessary logic for communication with the exte
 storage for the jobs.
 """
 
-from sqooler.storage_providers.base import StorageProvider
-from sqooler.storage_providers.mongodb import MongodbProviderExtended
-from sqooler.storage_providers.dropbox import DropboxProviderExtended
-from sqooler.storage_providers.local import LocalProviderExtended
-
-from sqooler.schemes import (
-    MongodbLoginInformation,
-    DropboxLoginInformation,
-    LocalLoginInformation,
-)
-
 # get the environment variables
 from decouple import config
+from sqooler.schemes import (
+    DropboxLoginInformation,
+    LocalLoginInformation,
+    MongodbLoginInformation,
+)
+from sqooler.storage_providers.base import StorageProvider
+from sqooler.storage_providers.dropbox import DropboxProviderExtended
+from sqooler.storage_providers.local import LocalProviderExtended
+from sqooler.storage_providers.mongodb import MongodbProviderExtended
 
 
 def get_storage_provider(backend_name: str) -> StorageProvider:

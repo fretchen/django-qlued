@@ -5,15 +5,13 @@ The models that define our sql tables for the app.
 import re
 
 from django.conf import settings
-from django.db import models
 from django.core.exceptions import ValidationError as DjangoValidationError
-
+from django.db import models
 from pydantic import ValidationError as PydanticValidationError
-
 from sqooler.schemes import (
-    MongodbLoginInformation,
     DropboxLoginInformation,
     LocalLoginInformation,
+    MongodbLoginInformation,
 )
 
 
