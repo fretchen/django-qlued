@@ -4,29 +4,25 @@ Module that defines the user api v2 which goes through django-ninja.
 
 import json
 
-from ninja import NinjaAPI
-from ninja.responses import codes_4xx
-
 from decouple import config
 from dropbox.exceptions import ApiError, AuthError
-
+from ninja import NinjaAPI
+from ninja.responses import codes_4xx
 from sqooler.schemes import (
     BackendConfigSchemaOut,
     BackendStatusSchemaOut,
-    StatusMsgDict,
     ResultDict,
+    StatusMsgDict,
     get_init_status,
 )
 
-from .schemas import (
-    JobSchemaWithTokenIn,
+from .models import StorageProviderDb, Token
+from .schemas import JobSchemaWithTokenIn
+from .storage_providers import (
+    get_short_backend_name,
+    get_storage_provider,
+    get_storage_provider_from_entry,
 )
-
-from .models import Token, StorageProviderDb
-from .storage_providers import get_storage_provider, get_storage_provider_from_entry
-
-from .storage_providers import get_short_backend_name
-
 
 api = NinjaAPI(version="2.0.0")
 
