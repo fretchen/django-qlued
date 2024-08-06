@@ -8,15 +8,12 @@ import uuid
 from datetime import datetime
 
 import pytz
-from cryptography.hazmat.primitives.asymmetric.ed25519 import (
-    Ed25519PrivateKey,
-    Ed25519PublicKey,
-)
 from decouple import config
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse_lazy
 from sqooler.schemes import MongodbLoginInformation
+from sqooler.security import create_key_pair
 from sqooler.storage_providers.mongodb import MongodbProviderExtended as MongodbProvider
 
 from qlued.models import StorageProviderDb, Token
