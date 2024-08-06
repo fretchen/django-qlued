@@ -2,6 +2,8 @@
 In this module, we make sure that the user can have the correct token as he tries to identify with his private key.
 """
 
+import uuid
+
 from decouple import config
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -56,9 +58,9 @@ class UserTokenTests(TestCase):
         private_jwk, public_jwk = create_jwk_pair(self.username)
 
         # the private key is for the user only and for signing jobs etc
+        # now we need to create a uuid for the user, safe it and upload the token at the appropiate point.
 
         # the public key is there to identify the user
-        # upload the config
         storage_provider.upload_config(
             config_info, display_name=backend_name, private_jwk=private_jwk
         )

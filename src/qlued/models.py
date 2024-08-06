@@ -15,24 +15,17 @@ from sqooler.schemes import (
 )
 
 
-class Token(models.Model):
-    """
-    The backend class for the tokens that allow access to the different backends etc.
+def validate_uuid_hex(value):
+    if len(value) != 24 or not all(c in "0123456789abcdef" for c in value):
+        raise DjangoValidationError(f"{value} is not a valid UUID hex[:24]")
 
-    Args:
-        key: CharField, contains authorization token value.
-        user: ForeignKey, foreign key to the logged user.
-        created_at: DateTimeField, contains date and time of token creation.
-        is_active: BooleanField contains if token is active.
-    """
 
-    key = models.CharField(max_length=40, unique=True)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
-    created_at = models.DateTimeField()
-    is_active = models.BooleanField(default=False)
+class UUIDHexField(models.CharField):
+    default_validators = [validate_uuid_hex]
+
+    def __init__(self, *args, **kwargs):
+        kwargs["max_length"] = 24
+        super().__init__(*args, **kwargs)
 
 
 class StorageProviderDb(models.Model):
@@ -132,3 +125,33 @@ class StorageProviderDb(models.Model):
             raise DjangoValidationError(
                 {"storage_type": f"Value '{self.storage_type}' is not a valid choice."}
             )
+
+
+class Token(models.Model):
+    """
+    The backend class for the tokens that allow access to the different backends etc.
+
+    Args:
+        key: CharField, contains authorization token value.
+        user: ForeignKey, foreign key to the logged user.
+        created_at: DateTimeField, contains date and time of token creation.
+        is_active: BooleanField contains if token is active.
+        storage_provider: ForeignKey, foreign key to the storage provider.
+        uuid_hex: UUIDHexField, contains a unique identifier in hex format which is associated
+                with the user itself.
+    """
+
+    key = models.CharField(max_length=40, unique=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField()
+    is_active = models.BooleanField(default=False)
+    storage_provider = models.ForeignKey(
+        StorageProviderDb,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    uuid_hex = UUIDHexField(unique=True, blank=True, null=True)
