@@ -22,6 +22,7 @@ from sqooler.schemes import (
     StatusMsgDict,
     get_init_status,
 )
+from sqooler.security import JWSFlat
 
 from .models import StorageProviderDb, Token
 from .schemas import JobSchemaWithTokenIn
@@ -156,7 +157,7 @@ def get_backend_status(request, backend_name: str):
     tags=["Backend"],
     url_name="post_job",
 )
-def post_job(request, data: JobSchemaWithTokenIn, backend_name: str):
+def post_job(request, data: JWSFlat, backend_name: str):
     """
     A view to submit the job to the backend.
     """
