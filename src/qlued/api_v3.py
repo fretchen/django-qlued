@@ -157,7 +157,7 @@ def get_backend_status(request, backend_name: str):
     tags=["Backend"],
     url_name="post_job",
 )
-def post_job(request, data: JWSFlat, backend_name: str):
+def post_job(request, data: JobSchemaWithTokenIn | JWSFlat, backend_name: str):
     """
     A view to submit the job to the backend.
     """
