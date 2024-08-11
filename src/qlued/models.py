@@ -154,4 +154,3 @@ class Token(models.Model):
         blank=True,
         null=True,
     )
-    uuid_hex = UUIDHexField(unique=True, blank=True, null=True)
