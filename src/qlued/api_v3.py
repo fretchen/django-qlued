@@ -11,9 +11,11 @@ In this module we define the key feature for the API in v3. This includes the fo
 
 import json
 
+from typing import Any, Optional
 from decouple import config
 from dropbox.exceptions import ApiError, AuthError
 from ninja import NinjaAPI
+from ninja.security import HttpBearer
 from ninja.responses import codes_4xx
 from sqooler.schemes import (
     BackendConfigSchemaOut,
@@ -22,7 +24,8 @@ from sqooler.schemes import (
     StatusMsgDict,
     get_init_status,
 )
-from sqooler.security import JWSFlat
+
+from django.http import HttpRequest, HttpResponse
 
 from .models import StorageProviderDb, Token
 from .schemas import JobSchemaWithTokenIn
@@ -32,7 +35,47 @@ from .storage_providers import (
     get_storage_provider_from_entry,
 )
 
+from icecream import ic
+
 api = NinjaAPI(version="3.0.0")
+
+
+class InvalidToken(Exception):
+    """
+    Exception that is raised when the access token is invalid.
+    """
+
+    pass
+
+
+@api.exception_handler(InvalidToken)
+def on_invalid_token(request: HttpRequest, exc: Exception) -> HttpResponse:
+    """
+    Exception handler for the InvalidToken exception.
+    """
+    job_response_dict = {
+        "job_id": "None",
+        "status": "None",
+        "detail": "None",
+        "error_message": "None",
+    }
+    job_response_dict["status"] = "ERROR"
+    job_response_dict["error_message"] = "Invalid credentials!"
+    job_response_dict["detail"] = "Invalid credentials!"
+
+    return api.create_response(request, job_response_dict, status=401)
+
+
+class AuthBearer(HttpBearer):
+
+    def authenticate(self, request: HttpRequest, token: str) -> bool:
+
+        try:
+            token_obj = Token.objects.get(key=token)
+            ic(token_obj)
+            return True
+        except Token.DoesNotExist as f:
+            raise InvalidToken from f
 
 
 @api.get(
@@ -156,8 +199,9 @@ def get_backend_status(request, backend_name: str):
     response={200: StatusMsgDict, codes_4xx: StatusMsgDict},
     tags=["Backend"],
     url_name="post_job",
+    auth=AuthBearer(),
 )
-def post_job(request, data: JobSchemaWithTokenIn | JWSFlat, backend_name: str):
+def post_job(request, data: JobSchemaWithTokenIn, backend_name: str):
     """
     A view to submit the job to the backend.
     """
@@ -169,6 +213,7 @@ def post_job(request, data: JobSchemaWithTokenIn | JWSFlat, backend_name: str):
         "error_message": "None",
     }
 
+    ic("Here I am.")
     # first we need to validate the token and make sure that the user is allowed to submit jobs
     api_key = data.token
 

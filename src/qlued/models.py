@@ -137,8 +137,6 @@ class Token(models.Model):
         created_at: DateTimeField, contains date and time of token creation.
         is_active: BooleanField contains if token is active.
         storage_provider: ForeignKey, foreign key to the storage provider.
-        uuid_hex: UUIDHexField, contains a unique identifier in hex format which is associated
-                with the user itself.
     """
 
     key = models.CharField(max_length=40, unique=True)

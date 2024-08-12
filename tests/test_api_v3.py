@@ -13,7 +13,6 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse_lazy
 from sqooler.schemes import MongodbLoginInformation
-from sqooler.security import create_key_pair
 from sqooler.storage_providers.mongodb import MongodbProviderExtended as MongodbProvider
 
 from qlued.models import StorageProviderDb, Token
@@ -22,7 +21,7 @@ from qlued.storage_providers import get_storage_provider_from_entry
 from .utils import get_dummy_config
 
 User = get_user_model()
-
+from icecream import ic
 
 class BackendConfigTest(TestCase):
     """
@@ -63,7 +62,7 @@ class BackendConfigTest(TestCase):
         Test the API that presents the capabilities of the backend through the new version
          of the API
         """
-        url = reverse_lazy("api-2.0.0:get_config", kwargs={"backend_name": "fermions"})
+        url = reverse_lazy("api-3.0.0:get_config", kwargs={"backend_name": "fermions"})
         req = self.client.get(url)
         data = json.loads(req.content)
         self.assertEqual(req.status_code, 200)
@@ -93,7 +92,7 @@ class BackendConfigTest(TestCase):
         # test also with its full name
 
         url = reverse_lazy(
-            "api-2.0.0:get_config",
+            "api-3.0.0:get_config",
             kwargs={"backend_name": "alqor_singlequdit_simulator"},
         )
         req = self.client.get(url)
@@ -107,7 +106,7 @@ class BackendConfigTest(TestCase):
         Test the API that presents the status of the backend
         """
         url = reverse_lazy(
-            "api-2.0.0:get_backend_status",
+            "api-3.0.0:get_backend_status",
             kwargs={"backend_name": "alqor_fermions_simulator"},
         )
         req = self.client.get(url)
@@ -134,7 +133,7 @@ class BackendConfigTest(TestCase):
         """
         Test that we are able to obtain the config of all the backends.
         """
-        url = reverse_lazy("api-2.0.0:get_backends")
+        url = reverse_lazy("api-3.0.0:get_backends")
         req = self.client.get(url)
         data = json.loads(req.content)
         self.assertEqual(req.status_code, 200)
@@ -197,12 +196,13 @@ class JobSubmissionTest(TestCase):
             },
         }
 
-        url = reverse_lazy("api-2.0.0:post_job", kwargs={"backend_name": "fermions"})
+        url = reverse_lazy("api-3.0.0:post_job", kwargs={"backend_name": "fermions"})
 
         req = self.client.post(
             url,
             {"job": json.dumps(job_payload), "token": self.token.key},
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
         data = json.loads(req.content)
         self.assertEqual(data["status"], "INITIALIZING")
@@ -213,8 +213,10 @@ class JobSubmissionTest(TestCase):
             url,
             {"job": json.dumps(job_payload), "token": "DUMMY"},
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer DUMMY",
         )
         data = req.json()
+        ic(data)
         self.assertEqual(data["status"], "ERROR")
 
     def test_get_job_status_ninja(self):
@@ -235,7 +237,7 @@ class JobSubmissionTest(TestCase):
                 "wire_order": "sequential",
             },
         }
-        url = reverse_lazy("api-2.0.0:post_job", kwargs={"backend_name": "fermions"})
+        url = reverse_lazy("api-3.0.0:post_job", kwargs={"backend_name": "fermions"})
 
         req = self.client.post(
             url,
@@ -249,7 +251,7 @@ class JobSubmissionTest(TestCase):
 
         req_id = data["job_id"]
         url = reverse_lazy(
-            "api-2.0.0:get_job_status", kwargs={"backend_name": "fermions"}
+            "api-3.0.0:get_job_status", kwargs={"backend_name": "fermions"}
         )
 
         # test what happens with a non confirmed job and something that is non existent
@@ -270,7 +272,7 @@ class JobSubmissionTest(TestCase):
 
         # use a poor URL with a non-existent backend
         url = reverse_lazy(
-            "api-2.0.0:get_job_status", kwargs={"backend_name": "wrongname"}
+            "api-3.0.0:get_job_status", kwargs={"backend_name": "wrongname"}
         )
         req = self.client.get(
             url,
@@ -280,7 +282,7 @@ class JobSubmissionTest(TestCase):
 
         # test the right thing
         url = reverse_lazy(
-            "api-2.0.0:get_job_status", kwargs={"backend_name": "fermions"}
+            "api-3.0.0:get_job_status", kwargs={"backend_name": "fermions"}
         )
 
         req = self.client.get(
@@ -332,7 +334,7 @@ class JobSubmissionTest(TestCase):
                 "wire_order": "sequential",
             },
         }
-        url = reverse_lazy("api-2.0.0:post_job", kwargs={"backend_name": "fermions"})
+        url = reverse_lazy("api-3.0.0:post_job", kwargs={"backend_name": "fermions"})
 
         req = self.client.post(
             url,
@@ -346,7 +348,7 @@ class JobSubmissionTest(TestCase):
 
         req_id = data["job_id"]
         url = reverse_lazy(
-            "api-2.0.0:get_job_result", kwargs={"backend_name": "fermions"}
+            "api-3.0.0:get_job_result", kwargs={"backend_name": "fermions"}
         )
         req = self.client.get(
             url,
@@ -451,7 +453,7 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
         }
 
         url = reverse_lazy(
-            "api-2.0.0:post_job", kwargs={"backend_name": "local1_fermions_simulator"}
+            "api-3.0.0:post_job", kwargs={"backend_name": "local1_fermions_simulator"}
         )
 
         req = self.client.post(
@@ -480,7 +482,7 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
         }
 
         url = reverse_lazy(
-            "api-2.0.0:post_job", kwargs={"backend_name": "local2_fermions_simulator"}
+            "api-3.0.0:post_job", kwargs={"backend_name": "local2_fermions_simulator"}
         )
 
         req = self.client.post(
@@ -520,7 +522,7 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
             },
         }
         url = reverse_lazy(
-            "api-2.0.0:post_job", kwargs={"backend_name": "local1_fermions_simulator"}
+            "api-3.0.0:post_job", kwargs={"backend_name": "local1_fermions_simulator"}
         )
 
         req = self.client.post(
@@ -535,7 +537,7 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
 
         req_id = data["job_id"]
         url = reverse_lazy(
-            "api-2.0.0:get_job_status",
+            "api-3.0.0:get_job_status",
             kwargs={"backend_name": "local1_fermions_simulator"},
         )
 
@@ -566,7 +568,7 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
             },
         }
         url = reverse_lazy(
-            "api-2.0.0:post_job", kwargs={"backend_name": "local1_fermions_simulator"}
+            "api-3.0.0:post_job", kwargs={"backend_name": "local1_fermions_simulator"}
         )
 
         req = self.client.post(
@@ -581,7 +583,7 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
 
         req_id = data["job_id"]
         url = reverse_lazy(
-            "api-2.0.0:get_job_result",
+            "api-3.0.0:get_job_result",
             kwargs={"backend_name": "local1_fermions_simulator"},
         )
 
