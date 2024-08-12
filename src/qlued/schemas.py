@@ -14,3 +14,12 @@ class JobSchemaWithTokenIn(Schema):
 
     job: str
     token: str
+
+
+# pylint: disable=R0903
+class DictSchema(Schema):
+    """
+    A simple schema, which only details that a dict is required.
+    """
+
+    payload: dict

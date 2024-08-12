@@ -200,7 +200,7 @@ class JobSubmissionTest(TestCase):
 
         req = self.client.post(
             url,
-            {"job": json.dumps(job_payload), "token": self.token.key},
+            {"payload": job_payload},
             content_type="application/json",
             HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
@@ -211,12 +211,11 @@ class JobSubmissionTest(TestCase):
         # test that we cannot create a job with invalid token
         req = self.client.post(
             url,
-            {"job": json.dumps(job_payload), "token": "DUMMY"},
+            {"payload": job_payload},
             content_type="application/json",
             HTTP_AUTHORIZATION=f"Bearer DUMMY",
         )
         data = req.json()
-        ic(data)
         self.assertEqual(data["status"], "ERROR")
 
     def test_get_job_status_ninja(self):
@@ -241,8 +240,9 @@ class JobSubmissionTest(TestCase):
 
         req = self.client.post(
             url,
-            {"job": json.dumps(job_payload), "token": self.token.key},
+            {"payload": job_payload},
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
 
         data = json.loads(req.content)
@@ -251,21 +251,25 @@ class JobSubmissionTest(TestCase):
 
         req_id = data["job_id"]
         url = reverse_lazy(
-            "api-3.0.0:get_job_status", kwargs={"backend_name": "fermions"}
+            "api-3.0.0:get_job_status", kwargs={"backend_name": "fermions"},
         )
 
         # test what happens with a non confirmed job and something that is non existent
+        ic("This should work")
         req = self.client.get(
             url,
-            {"job_id": uuid.uuid4().hex, "token": self.token.key},
+            {"job_id": uuid.uuid4().hex},
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
+    
         data = json.loads(req.content)
         self.assertEqual(req.status_code, 406)
-
+        ic(data)
         # test what happens with a no job is provided
         req = self.client.get(
             url,
-            {"token": self.token.key},
+            token = self.token.key,
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
         data = json.loads(req.content)
         self.assertEqual(req.status_code, 422)
@@ -277,6 +281,7 @@ class JobSubmissionTest(TestCase):
         req = self.client.get(
             url,
             {"job_id": req_id, "token": self.token.key},
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
         self.assertEqual(req.status_code, 404)
 
@@ -287,7 +292,8 @@ class JobSubmissionTest(TestCase):
 
         req = self.client.get(
             url,
-            {"job_id": req_id, "token": self.token.key},
+            {"job_id": req_id},
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
 
         self.assertEqual(req.status_code, 200)
@@ -338,8 +344,9 @@ class JobSubmissionTest(TestCase):
 
         req = self.client.post(
             url,
-            {"job": json.dumps(job_payload), "token": self.token.key},
+            {"payload": job_payload},
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
 
         data = json.loads(req.content)
@@ -458,8 +465,9 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
 
         req = self.client.post(
             url,
-            {"job": json.dumps(job_payload), "token": self.token.key},
+            {"payload": job_payload},
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
         data = json.loads(req.content)
         self.assertEqual(data["status"], "INITIALIZING")
@@ -487,8 +495,9 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
 
         req = self.client.post(
             url,
-            {"job": json.dumps(job_payload), "token": self.token.key},
+            {"payload": job_payload},
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
         data = json.loads(req.content)
         self.assertEqual(data["status"], "ERROR")
@@ -497,8 +506,9 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
         # test that we cannot create a job with invalid token
         req = self.client.post(
             url,
-            {"job": json.dumps(job_payload), "token": "DUMMY"},
+            {"payload": job_payload},
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer Dummy",
         )
         data = req.json()
         self.assertEqual(data["status"], "ERROR")
@@ -527,8 +537,9 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
 
         req = self.client.post(
             url,
-            {"job": json.dumps(job_payload), "token": self.token.key},
+            {"payload": job_payload},
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
 
         data = json.loads(req.content)
@@ -540,10 +551,11 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
             "api-3.0.0:get_job_status",
             kwargs={"backend_name": "local1_fermions_simulator"},
         )
-
+        ic("This should work also")
         req = self.client.get(
             url,
             {"job_id": req_id, "token": self.token.key},
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
         self.assertEqual(req.status_code, 200)
         data = json.loads(req.content)
@@ -573,8 +585,9 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
 
         req = self.client.post(
             url,
-            {"job": json.dumps(job_payload), "token": self.token.key},
+            {"payload": job_payload},
             content_type="application/json",
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
 
         data = json.loads(req.content)

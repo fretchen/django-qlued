@@ -28,7 +28,7 @@ from sqooler.schemes import (
 from django.http import HttpRequest, HttpResponse
 
 from .models import StorageProviderDb, Token
-from .schemas import JobSchemaWithTokenIn
+from .schemas import JobSchemaWithTokenIn, DictSchema
 from .storage_providers import (
     get_short_backend_name,
     get_storage_provider,
@@ -68,12 +68,11 @@ def on_invalid_token(request: HttpRequest, exc: Exception) -> HttpResponse:
 
 class AuthBearer(HttpBearer):
 
-    def authenticate(self, request: HttpRequest, token: str) -> bool:
+    def authenticate(self, request: HttpRequest, token: str) -> str:
 
         try:
             token_obj = Token.objects.get(key=token)
-            ic(token_obj)
-            return True
+            return token
         except Token.DoesNotExist as f:
             raise InvalidToken from f
 
@@ -201,10 +200,14 @@ def get_backend_status(request, backend_name: str):
     url_name="post_job",
     auth=AuthBearer(),
 )
-def post_job(request, data: JobSchemaWithTokenIn, backend_name: str):
+def post_job(request, data: DictSchema, backend_name: str):
     """
     A view to submit the job to the backend.
     """
+    # the token is stored in the request object as the attribute auth
+    # the user has to provider it during identification
+    api_key = request.auth
+
     # pylint: disable=R0914, W0613
     job_response_dict = {
         "job_id": "None",
@@ -213,18 +216,8 @@ def post_job(request, data: JobSchemaWithTokenIn, backend_name: str):
         "error_message": "None",
     }
 
-    ic("Here I am.")
-    # first we need to validate the token and make sure that the user is allowed to submit jobs
-    api_key = data.token
-
-    try:
-        token = Token.objects.get(key=api_key)
-    except Token.DoesNotExist:
-        job_response_dict["status"] = "ERROR"
-        job_response_dict["error_message"] = "Invalid credentials!"
-        job_response_dict["detail"] = "Invalid credentials!"
-        return 401, job_response_dict
-
+    token = Token.objects.get(key=api_key)
+    
     username = token.user.username
     # get the proper backend name
     short_backend = get_short_backend_name(backend_name)
@@ -238,15 +231,7 @@ def post_job(request, data: JobSchemaWithTokenIn, backend_name: str):
         return 404, job_response_dict
 
     # as the backend is known, we can now try to submit the job
-    try:
-        job_dict = json.loads(data.job)
-    except json.decoder.JSONDecodeError:
-        job_response_dict["status"] = "ERROR"
-        job_response_dict["detail"] = "The encoding of your json seems not work out!"
-        job_response_dict["error_message"] = (
-            "The encoding of your json seems not work out!"
-        )
-        return 406, job_response_dict
+    job_dict = data.payload
     try:
         storage_provider = get_storage_provider(backend_name)
 
@@ -275,23 +260,18 @@ def post_job(request, data: JobSchemaWithTokenIn, backend_name: str):
     response={200: StatusMsgDict, codes_4xx: StatusMsgDict},
     tags=["Backend"],
     url_name="get_job_status",
+    auth=AuthBearer(),
 )
-def get_job_status(request, backend_name: str, job_id: str, token: str):
+def get_job_status(request, backend_name: str, job_id: str):
     """
     A view to check the job status that was previously submitted to the backend.
     """
+    ic("Authorized")
     # pylint: disable=W0613
     job_response_dict = get_init_status()
-
-    # first we need to validate the token and make sure that the user is allowed to look for the job
-    try:
-        token_object = Token.objects.get(key=token)
-    except Token.DoesNotExist:
-        job_response_dict.status = "ERROR"
-        job_response_dict.error_message = "Invalid credentials!"
-        job_response_dict.detail = "Invalid credentials!"
-        return 401, job_response_dict
-
+    token = request.auth
+    token_object = Token.objects.get(key=token)
+    ic(job_id)
     username = token_object.user.username
     storage_provider = get_storage_provider(backend_name)
     backend_names = storage_provider.get_backends()
