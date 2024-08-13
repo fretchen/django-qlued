@@ -28,14 +28,13 @@ from sqooler.schemes import (
 from django.http import HttpRequest, HttpResponse
 
 from .models import StorageProviderDb, Token
-from .schemas import JobSchemaWithTokenIn, DictSchema
+from .schemas import  DictSchema
 from .storage_providers import (
     get_short_backend_name,
     get_storage_provider,
     get_storage_provider_from_entry,
 )
 
-from icecream import ic
 
 api = NinjaAPI(version="3.0.0")
 
@@ -266,12 +265,10 @@ def get_job_status(request, backend_name: str, job_id: str):
     """
     A view to check the job status that was previously submitted to the backend.
     """
-    ic("Authorized")
     # pylint: disable=W0613
     job_response_dict = get_init_status()
     token = request.auth
     token_object = Token.objects.get(key=token)
-    ic(job_id)
     username = token_object.user.username
     storage_provider = get_storage_provider(backend_name)
     backend_names = storage_provider.get_backends()
@@ -299,8 +296,9 @@ def get_job_status(request, backend_name: str, job_id: str):
     response={200: StatusMsgDict | ResultDict, codes_4xx: StatusMsgDict},
     tags=["Backend"],
     url_name="get_job_result",
+    auth=AuthBearer(),
 )
-def get_job_result(request, backend_name: str, job_id: str, token: str):
+def get_job_result(request, backend_name: str, job_id: str):
     """
     A view to obtain the results of job that was previously submitted to the backend.
     """
@@ -312,13 +310,8 @@ def get_job_result(request, backend_name: str, job_id: str, token: str):
         "error_message": "None",
     }
 
-    try:
-        token_object = Token.objects.get(key=token)
-    except Token.DoesNotExist:
-        status_msg_draft["status"] = "ERROR"
-        status_msg_draft["error_message"] = "Invalid credentials!"
-        status_msg_draft["detail"] = "Invalid credentials!"
-        return 401, status_msg_draft
+    token = request.auth
+    token_object = Token.objects.get(key=token)
 
     username = token_object.user.username
     short_backend = get_short_backend_name(backend_name)

@@ -21,7 +21,6 @@ from qlued.storage_providers import get_storage_provider_from_entry
 from .utils import get_dummy_config
 
 User = get_user_model()
-from icecream import ic
 
 class BackendConfigTest(TestCase):
     """
@@ -213,7 +212,7 @@ class JobSubmissionTest(TestCase):
             url,
             {"payload": job_payload},
             content_type="application/json",
-            HTTP_AUTHORIZATION=f"Bearer DUMMY",
+            HTTP_AUTHORIZATION="Bearer DUMMY",
         )
         data = req.json()
         self.assertEqual(data["status"], "ERROR")
@@ -255,16 +254,14 @@ class JobSubmissionTest(TestCase):
         )
 
         # test what happens with a non confirmed job and something that is non existent
-        ic("This should work")
         req = self.client.get(
             url,
             {"job_id": uuid.uuid4().hex},
             HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
-    
+
         data = json.loads(req.content)
         self.assertEqual(req.status_code, 406)
-        ic(data)
         # test what happens with a no job is provided
         req = self.client.get(
             url,
@@ -359,7 +356,8 @@ class JobSubmissionTest(TestCase):
         )
         req = self.client.get(
             url,
-            {"job_id": req_id, "token": self.token.key},
+            {"job_id": req_id},
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
         self.assertEqual(req.status_code, 200)
         data = json.loads(req.content)
@@ -508,7 +506,7 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
             url,
             {"payload": job_payload},
             content_type="application/json",
-            HTTP_AUTHORIZATION=f"Bearer Dummy",
+            HTTP_AUTHORIZATION="Bearer Dummy",
         )
         data = req.json()
         self.assertEqual(data["status"], "ERROR")
@@ -551,7 +549,6 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
             "api-3.0.0:get_job_status",
             kwargs={"backend_name": "local1_fermions_simulator"},
         )
-        ic("This should work also")
         req = self.client.get(
             url,
             {"job_id": req_id, "token": self.token.key},
@@ -602,7 +599,8 @@ class JobSubmissionWithMultipleLocalProvidersTest(TestCase):
 
         req = self.client.get(
             url,
-            {"job_id": req_id, "token": self.token.key},
+            {"job_id": req_id},
+            HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
         self.assertEqual(req.status_code, 200)
         data = json.loads(req.content)
