@@ -22,6 +22,7 @@ from .utils import get_dummy_config
 
 User = get_user_model()
 
+
 class BackendConfigTest(TestCase):
     """
     The class that contains all the tests for this backends app.
@@ -250,7 +251,8 @@ class JobSubmissionTest(TestCase):
 
         req_id = data["job_id"]
         url = reverse_lazy(
-            "api-3.0.0:get_job_status", kwargs={"backend_name": "fermions"},
+            "api-3.0.0:get_job_status",
+            kwargs={"backend_name": "fermions"},
         )
 
         # test what happens with a non confirmed job and something that is non existent
@@ -265,7 +267,7 @@ class JobSubmissionTest(TestCase):
         # test what happens with a no job is provided
         req = self.client.get(
             url,
-            token = self.token.key,
+            token=self.token.key,
             HTTP_AUTHORIZATION=f"Bearer {self.token.key}",
         )
         data = json.loads(req.content)

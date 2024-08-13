@@ -10,12 +10,12 @@ In this module we define the key feature for the API in v3. This includes the fo
                 as they are test systems.
 """
 
-
 from decouple import config
+from django.http import HttpRequest, HttpResponse
 from dropbox.exceptions import ApiError, AuthError
 from ninja import NinjaAPI
-from ninja.security import HttpBearer
 from ninja.responses import codes_4xx
+from ninja.security import HttpBearer
 from sqooler.schemes import (
     BackendConfigSchemaOut,
     BackendStatusSchemaOut,
@@ -23,8 +23,6 @@ from sqooler.schemes import (
     StatusMsgDict,
     get_init_status,
 )
-
-from django.http import HttpRequest, HttpResponse
 
 from .models import StorageProviderDb, Token
 from .schemas import DictSchema
@@ -34,7 +32,6 @@ from .storage_providers import (
     get_storage_provider_from_entry,
 )
 
-
 api = NinjaAPI(version="3.0.0")
 
 
@@ -42,6 +39,7 @@ class InvalidToken(Exception):
     """
     Exception that is raised when the access token is invalid.
     """
+
 
 @api.exception_handler(InvalidToken)
 def on_invalid_token(request: HttpRequest, exc: Exception) -> HttpResponse:
@@ -67,6 +65,7 @@ class AuthBearer(HttpBearer):
     """
     Class that handles authentification through a token.
     """
+
     # pylint: disable=R0903
     def authenticate(self, request: HttpRequest, token: str) -> str:
 
