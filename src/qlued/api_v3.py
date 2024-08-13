@@ -6,12 +6,11 @@ In this module we define the key feature for the API in v3. This includes the fo
 - post_job: A view to submit the job to the backend.
 - get_job_status: A view to check the job status that was previously submitted to the backend.
 - get_job_result: A view to obtain the results of job that was previously submitted to the backend.
-- list_backends: Returns the list of backends, excluding any device called "dummy_" as they are test systems.
+- list_backends: Returns the list of backends, excluding any device called "dummy_" 
+                as they are test systems.
 """
 
-import json
 
-from typing import Any, Optional
 from decouple import config
 from dropbox.exceptions import ApiError, AuthError
 from ninja import NinjaAPI
@@ -28,7 +27,7 @@ from sqooler.schemes import (
 from django.http import HttpRequest, HttpResponse
 
 from .models import StorageProviderDb, Token
-from .schemas import  DictSchema
+from .schemas import DictSchema
 from .storage_providers import (
     get_short_backend_name,
     get_storage_provider,
@@ -44,14 +43,13 @@ class InvalidToken(Exception):
     Exception that is raised when the access token is invalid.
     """
 
-    pass
-
-
 @api.exception_handler(InvalidToken)
 def on_invalid_token(request: HttpRequest, exc: Exception) -> HttpResponse:
     """
     Exception handler for the InvalidToken exception.
     """
+    # pylint: disable=W0613
+
     job_response_dict = {
         "job_id": "None",
         "status": "None",
@@ -66,11 +64,14 @@ def on_invalid_token(request: HttpRequest, exc: Exception) -> HttpResponse:
 
 
 class AuthBearer(HttpBearer):
-
+    """
+    Class that handles authentification through a token.
+    """
+    # pylint: disable=R0903
     def authenticate(self, request: HttpRequest, token: str) -> str:
 
         try:
-            token_obj = Token.objects.get(key=token)
+            Token.objects.get(key=token)
             return token
         except Token.DoesNotExist as f:
             raise InvalidToken from f
@@ -216,7 +217,7 @@ def post_job(request, data: DictSchema, backend_name: str):
     }
 
     token = Token.objects.get(key=api_key)
-    
+
     username = token.user.username
     # get the proper backend name
     short_backend = get_short_backend_name(backend_name)

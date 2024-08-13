@@ -15,19 +15,6 @@ from sqooler.schemes import (
 )
 
 
-def validate_uuid_hex(value):
-    if len(value) != 24 or not all(c in "0123456789abcdef" for c in value):
-        raise DjangoValidationError(f"{value} is not a valid UUID hex[:24]")
-
-
-class UUIDHexField(models.CharField):
-    default_validators = [validate_uuid_hex]
-
-    def __init__(self, *args, **kwargs):
-        kwargs["max_length"] = 24
-        super().__init__(*args, **kwargs)
-
-
 class StorageProviderDb(models.Model):
     """
     This class allows users to access storage providers in the same way as they
