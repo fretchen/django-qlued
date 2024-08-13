@@ -6,18 +6,6 @@ from ninja import Schema
 
 
 # pylint: disable=R0903
-class JobSchemaIn(Schema):
-    """
-    The schema that is set up for the submission of new jobs.  We follow the
-    conventions of the `qiskit-cold-atom` here.
-    """
-
-    job: str
-    username: str
-    password: str
-
-
-# pylint: disable=R0903
 class JobSchemaWithTokenIn(Schema):
     """
     The schema that is set up for the submission of new jobs.  This is the schema used in v2
@@ -26,3 +14,12 @@ class JobSchemaWithTokenIn(Schema):
 
     job: str
     token: str
+
+
+# pylint: disable=R0903
+class DictSchema(Schema):
+    """
+    A simple schema, which only details that a dict is required.
+    """
+
+    payload: dict
